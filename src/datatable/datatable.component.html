@@ -1,0 +1,55 @@
+
+<div>
+  <p>Click one of the buttons to change the data in the table</p>
+  <p>(Dynamic columns with multiselect, sort and pagination!)</p>
+</div>
+<div>
+  <button (click)="showTransactions()">Show Transactions</button>
+  <button (click)="showProducts()">Show Products</button>
+  <button (click)="showFamilies()">Show Families</button>
+</div>
+
+<mat-card>
+
+  <mat-form-field>
+    <input (keyup)="filterBy($event)" matInput placeholder="Filter">
+  </mat-form-field>
+
+  <mat-table [dataSource]="rows" matSort matSortActive="symbol" matSortDirection="asc">
+
+    <ng-container matColumnDef="{{column}}" *ngFor="let column of columns; let i = index;">
+      <span *ngIf="i === 0">
+        <mat-header-cell *matHeaderCellDef>
+          <mat-checkbox (change)="$event ? masterToggle() : null"
+                        [checked]="selection.hasValue() && isAllSelected()"
+                        [indeterminate]="selection.hasValue() && !isAllSelected()"
+                        [aria-label]="checkboxLabel()">
+          </mat-checkbox>
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <mat-checkbox (click)="$event.stopPropagation()"
+                        (change)="$event ? selection.toggle(row) : null"
+                        [checked]="selection.isSelected(row)"
+                        [aria-label]="checkboxLabel(row)">
+          </mat-checkbox>
+        </mat-cell>
+      </span>
+
+      <span *ngIf="i !== 0">
+        <mat-header-cell mat-sort-header *matHeaderCellDef>
+        {{column | fieldToDisplay}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element;">
+        {{element[column]}}
+        </mat-cell>
+      </span>
+
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="columns; sticky: true;"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: columns;" (click)="selection.toggle(row)"></mat-row>
+
+  </mat-table>
+
+  <mat-paginator pageSize="3" showFirstLastButtons></mat-paginator>
+</mat-card>
